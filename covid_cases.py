@@ -139,11 +139,14 @@ sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[
 
 print(sentence)
 
+info = time.strftime('%Y-%m-%d', time.localtime())
+print(info)
+
 import os
 path = "./results"
 if not os.path.exists(path):
     os.mkdir(path)
-with open("./results/test.md", "w") as f_out:
+with open("./results/" + info +".md", "w") as f_out:
     f_out.write(sentence)
 
 #print('请在生成数据后到对应网页再次人工核对数据准确性，尤其是美国数据，美国新增请使用worldo或者更合理的结果。')
