@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#取worldo新增病例数除美国前5的国家，并在jhu找到对应的累计病例，再同时汇报未提及的国家但累计确诊很高的。
-#需先安装第三方covid包，本地可使用pip install covid命令
-
-#print('为避免格式错误，请优先使用程序生成的语句，若程序出错请手工填写。')
-
 from covid import Covid
+import os
 import time
 import json
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+
+os.environ['TZ'] = 'US/Eastern'
+time.tzset()
 
 #keep country name in the same format
 trans_jhu = ['US','United Kingdom','United Arab Emirates']
@@ -71,8 +70,7 @@ worldo = covidw.get_data()
 
 #start building sentence
 
-date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[1]['last_update'] // 1000 - 4 * 3600))
-#date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[1]['last_update'] // 1000))
+date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[1]['last_update'] // 1000))
 
 worldo_US = [x for x in worldo if x['country'] == 'USA'][0]
 worldo = list(filter(lambda i:i['country'] not in ['World','North America','Asia','South America','Europe','Africa','Oceania', 'USA'], worldo))
@@ -142,8 +140,6 @@ sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[
 
 print(sentence)
 
-import os
-os.environ['TZ'] = 'US/Eastern'
 info = time.strftime('%Y%m%d%H%M', time.localtime())
 print(info)
 
@@ -152,8 +148,3 @@ if not os.path.exists(path):
     os.mkdir(path)
 with open("./results/" + info +".md", "w") as f_out:
     f_out.write(sentence)
-
-#print('请在生成数据后到对应网页再次人工核对数据准确性，尤其是美国数据，美国新增请使用worldo或者更合理的结果。')
-#print('新增数据来源:https://www.worldometers.info/coronavirus/')
-#print('累计确诊数据来源：https://coronavirus.jhu.edu/map.html')
-#print('疫苗数据采用fully vaccinated栏，来源：https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
