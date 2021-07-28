@@ -142,10 +142,11 @@ sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[
 
 print(sentence)
 
+import os
+os.environ['TZ'] = 'US/Eastern'
 info = time.strftime('%Y%m%d%H%M', time.localtime())
 print(info)
 
-import os
 path = "./results"
 if not os.path.exists(path):
     os.mkdir(path)
