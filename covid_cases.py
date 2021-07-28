@@ -29,10 +29,13 @@ def trans(x, orig, final):
     for i in range(len(orig)):
         x = x.replace(orig[i],final[i])
     return x
-'''
+
 #get vaccine numbers from BBG
 
-browser = webdriver.Firefox()
+options = webdriver.FirefoxOptions()
+options.headless = True
+
+browser = webdriver.Firefox(options=options)
 browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
 
 #click twice to load all countries
@@ -57,7 +60,7 @@ for index,tbody in enumerate(tbodies):
             except:
                 pass
     vacc[name] = numbers
-'''
+
 #get covid cases from Jhu
 covid = Covid()
 jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
