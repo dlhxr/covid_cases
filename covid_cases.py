@@ -139,7 +139,7 @@ sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[
 
 print(sentence)
 
-info = time.strftime('%Y-%m-%d', time.localtime())
+info = time.strftime('%Y%m%d%H%M', time.localtime())
 print(info)
 
 import os
