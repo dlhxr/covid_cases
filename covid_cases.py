@@ -136,7 +136,7 @@ for i in range(len(printlist)):
     words_country += printlist[i] + '、'
     words_newcases += newcases[i] + '万例、'
     words_cases += cases[i] + '万例、'
-    #words_vacc += vaccnumber[i] + '%、'
+    words_vacc += vaccnumber[i] + '%、'
 
 sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过300万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
 
