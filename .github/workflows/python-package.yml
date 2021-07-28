@@ -37,3 +37,13 @@ jobs:
     - name: Run covid numbers
       run: |
         python covid_cases.py
+    - name: commit
+      run: |
+        git config --global user.email dlhxr@163.com
+        git config --global user.name dlhxr
+        git add .
+        git commit -m "update" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
