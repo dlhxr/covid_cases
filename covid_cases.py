@@ -62,6 +62,30 @@ for index,tbody in enumerate(tbodies):
 
 #get covid cases from Jhu
 covid = Covid()
+
+jhu = covid.get_data()
+
+tmp = [[d['id'], d['country'], d['confirmed']] for d in jhu]
+tmp=pd.DataFrame(tmp,columns=['id', 'country',time.strftime('%Y%m%d', time.localtime())])
+tmp['id'] =pd.to_numeric(tmp['id'])
+tmp.sort_values("id",inplace=True)
+
+path = "./data"
+if not os.path.exists(path):
+    os.mkdir(path)
+if os.path.isfile('./data/data.csv'):
+    jhu_data = pd.read_csv('./data/data.csv')
+    jhu_data.to_csv('./data/data_bak.csv',index=0)
+    
+    #use the latest result as today's data
+    if jhu_data.columns.values[2] == tmp.columns.values[2]:
+        jhu_data.drop(jhu_data.columns.values[2], axis=1)
+    
+    jhu_data = pd.merge(tmp, jhu_data, on=['id','country'])
+else:
+    jhu_data = tmp
+jhu_data.to_csv('./data/data.csv',index=0)
+
 jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
 
 #get new cases from worldo
