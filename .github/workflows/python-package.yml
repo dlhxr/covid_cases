@@ -1,7 +1,6 @@
 name: Python package
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: '53,55 21 * * *'
