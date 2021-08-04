@@ -13,7 +13,7 @@ id,country,20210804
 12,Bahamas,15046
 13,Bahrain,269495
 14,Bangladesh,1309910
-15,Barbados,4422
+15,Barbados,4433
 16,Belarus,449302
 17,Belgium,1130758
 18,Belize,14284
@@ -31,9 +31,9 @@ id,country,20210804
 30,Cabo Verde,33906
 31,Cambodia,79634
 32,Cameroon,82064
-33,Canada,1441402
+33,Canada,1441701
 34,Central African Republic,7151
-35,Chad,4973
+35,Chad,4974
 36,Chile,1619183
 37,China,105353
 38,Colombia,4807979
@@ -46,7 +46,7 @@ id,country,20210804
 45,Cuba,422614
 46,Cyprus,103889
 47,Czechia,1673926
-48,Denmark,321340
+48,Denmark,321344
 49,Diamond Princess,712
 50,Djibouti,11655
 51,Dominica,218
@@ -55,21 +55,21 @@ id,country,20210804
 54,Egypt,284415
 55,El Salvador,87498
 56,Equatorial Guinea,8928
-57,Eritrea,6564
+57,Eritrea,6568
 58,Estonia,134221
-59,Eswatini,27467
-60,Ethiopia,281300
+59,Eswatini,28535
+60,Ethiopia,281811
 61,Fiji,32733
 62,Finland,109230
 63,France,6270504
 64,Gabon,25405
 65,Gambia,8296
 66,Georgia,432903
-67,Germany,3783929
+67,Germany,3785877
 68,Ghana,105512
 69,Greece,503885
 70,Grenada,164
-71,Guatemala,373047
+71,Guatemala,377446
 72,Guinea,26188
 73,Guinea-Bissau,4588
 74,Guyana,22643
@@ -93,11 +93,11 @@ id,country,20210804
 92,Kiribati,2
 93,"Korea, South",203926
 94,Kosovo,108844
-95,Kuwait,400128
+95,Kuwait,400979
 96,Kyrgyzstan,166236
 97,Laos,7015
 98,Latvia,139134
-99,Lebanon,564354
+99,Lebanon,565896
 100,Lesotho,13603
 101,Liberia,5459
 102,Libya,260951
@@ -109,7 +109,7 @@ id,country,20210804
 108,Malawi,54178
 109,Malaysia,1183110
 110,Maldives,77895
-111,Mali,14595
+111,Mali,14605
 112,Malta,34590
 113,Marshall Islands,4
 114,Mauritania,26902
@@ -117,14 +117,14 @@ id,country,20210804
 116,Mexico,2880409
 117,Micronesia,1
 118,Moldova,260024
-119,Monaco,2926
+119,Monaco,2940
 120,Mongolia,168673
 121,Montenegro,102660
 122,Morocco,653286
-123,Mozambique,126391
+123,Mozambique,127425
 124,Namibia,119984
 125,Nepal,705072
-126,Netherlands,1905024
+126,Netherlands,1905225
 127,New Zealand,2880
 128,Nicaragua,9853
 129,Niger,5658
@@ -145,7 +145,7 @@ id,country,20210804
 145,Russia,6274006
 146,Rwanda,72841
 147,Saint Kitts and Nevis,600
-148,Saint Lucia,5652
+148,Saint Lucia,5671
 149,Saint Vincent and the Grenadines,2297
 150,Samoa,3
 151,San Marino,5147
@@ -154,14 +154,14 @@ id,country,20210804
 154,Senegal,64522
 155,Serbia,723518
 156,Seychelles,18384
-157,Sierra Leone,6292
+157,Sierra Leone,6296
 158,Singapore,65410
 159,Slovakia,392845
 160,Slovenia,259625
 161,Solomon Islands,20
 162,Somalia,15658
 163,South Africa,2484009
-164,South Sudan,11076
+164,South Sudan,11081
 165,Spain,4544576
 166,Sri Lanka,318755
 167,Sudan,37138
@@ -169,17 +169,17 @@ id,country,20210804
 169,Suriname,25549
 170,Sweden,1102829
 171,Switzerland,721776
-172,Syria,26026
+172,Syria,26044
 173,Taiwan*,15742
-174,Tajikistan,15293
+174,Tajikistan,15364
 175,Tanzania,1017
 176,Thailand,672385
 177,Timor-Leste,11145
 178,Togo,16053
 179,Trinidad and Tobago,39162
 180,Tunisia,599594
-181,Turkey,5795665
-182,US,35277683
+181,Turkey,5822487
+182,US,35314746
 183,Uganda,94739
 184,Ukraine,2338123
 185,United Arab Emirates,686981
@@ -190,6 +190,6 @@ id,country,20210804
 190,Venezuela,308452
 191,Vietnam,174461
 192,West Bank and Gaza,317404
-193,Yemen,7086
+193,Yemen,7096
 194,Zambia,197791
 195,Zimbabwe,112435
