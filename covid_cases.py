@@ -81,7 +81,7 @@ if os.path.isfile('./data/data.csv'):
     #use the latest result as today's data
     if jhu_data.columns.values[2] == tmp.columns.values[2]:
         print("same")
-        jhu_data.drop(jhu_data.columns.values[2], axis=1)
+        jhu_data = jhu_data.drop(jhu_data.columns.values[2], axis=1)
     
     jhu_data = pd.merge(tmp, jhu_data, on=['id','country'])
 else:
