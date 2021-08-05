@@ -4,14 +4,15 @@
 from covid import Covid
 import os
 import time
-import json
-import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import pandas as pd
 
 os.environ['TZ'] = 'US/Eastern'
 time.tzset()
+
+info = time.strftime('%Y%m%d%H%M', time.localtime())
+print(info)
 
 #keep country name in the same format
 trans_jhu = ['US','United Kingdom','United Arab Emirates']
@@ -63,8 +64,8 @@ for index,tbody in enumerate(tbodies):
 
 #get covid cases from Jhu
 covid = Covid()
+jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
 
-jhu = covid.get_data()
 
 tmp = [[d['id'], d['country'], d['confirmed']] for d in jhu]
 tmp=pd.DataFrame(tmp,columns=['id', 'country',time.strftime('%Y%m%d', time.localtime())])
@@ -74,6 +75,7 @@ tmp.sort_values("id",inplace=True)
 path = "./data"
 if not os.path.exists(path):
     os.mkdir(path)
+
 if os.path.isfile('./data/data.csv'):
     jhu_data = pd.read_csv('./data/data.csv')
     jhu_data.to_csv('./data/data_bak.csv',index=0)
@@ -84,39 +86,28 @@ if os.path.isfile('./data/data.csv'):
         jhu_data = jhu_data.drop(jhu_data.columns.values[2], axis=1)
     
     jhu_data = pd.merge(tmp, jhu_data, on=['id','country'])
+
 else:
     jhu_data = tmp
+    
 jhu_data.to_csv('./data/data.csv',index=0)
 
-jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
+#keep only id, country and cases for two days
+jhu_data = jhu_data.iloc[:,1:4]
+jhu_data['new_cases'] = jhu_data.iloc[:,1] - jhu_data.iloc[:,2]
+jhu_data.sort_values('new_cases',inplace=True, ascending=False)
 
-#get new cases from worldo
-covidw = Covid(source="worldometers")
-worldo = covidw.get_data()
+jhu_us = jhu_data.loc[jhu_data['country'] == 'US']
+jhu_data = jhu_data.drop(jhu_data.loc[jhu_data['country'] == 'US'].index[0])
+jhu_data = jhu_us.append(jhu_data.iloc[0:4,:])
 
 #start building sentence
 
-date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[1]['last_update'] // 1000))
+date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[0]['last_update'] // 1000))
 
-worldo_US = [x for x in worldo if x['country'] == 'USA'][0]
-worldo = list(filter(lambda i:i['country'] not in ['World','North America','Asia','South America','Europe','Africa','Oceania', 'USA'], worldo))
+printlist = list(jhu_data['country'])
 
-worldo = sorted(worldo, key = lambda i:i['new_cases'], reverse=True)
-worldolist = worldo[0:4]
-
-printlist = [x['country'] for x in worldolist]
-
-#add UK if it's not Top 4 since it reflects EU covid status
-if 'UK' not in printlist:
-    worldo_UK = [x for x in worldo if x['country'] == 'UK'][0]
-    worldolist.append(worldo_UK)
-
-worldolist.insert(0, worldo_US)
-
-printlist = [x['country'] for x in worldolist]
-printlist = [trans(x,trans_worldo,trans_jhu) for x in printlist]
-
-newcases = ["{:.1f}".format(x['new_cases']/10000) for x in worldolist]
+newcases = ["{:.1f}".format(x/10000) for x in list(jhu_data['new_cases'])]
 
 countrylist = [x for x in jhu if x['confirmed']>3000000]
 countrylist = [x['country'] for x in countrylist]
@@ -124,17 +115,7 @@ countrylist = [x['country'] for x in countrylist]
 extralist = [x for x in countrylist if x not in printlist]
 
 #get cases and deaths from jhu
-cases = list()
-deaths = list()
-
-for country in printlist:
-    selected = [k for k in jhu if k['country'] == country]
-    if selected != []:
-        cases.append("{:.0f}".format(selected[0]['confirmed']/10000))
-        deaths.append("{:.0f}".format(selected[0]['deaths']/10000))
-    else:
-        cases.append('NA')
-        deaths.append('NA')
+cases = ["{:.0f}".format(x/10000) for x in list(jhu_data[time.strftime('%Y%m%d', time.localtime())])]
 
 #get vaccine number from bbg
 vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
@@ -145,7 +126,6 @@ for country in vacclist:
         vaccnumber.append('NA')
     else:
         vaccnumber.append(vacc.get(country)[3])
-
 
 printlist = [trans(x,trans_en,trans_cn) for x in printlist]
 extralist = [trans(x,trans_en,trans_cn) for x in extralist]
@@ -165,9 +145,6 @@ for i in range(len(printlist)):
 sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过300万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
 
 print(sentence)
-
-info = time.strftime('%Y%m%d%H%M', time.localtime())
-print(info)
 
 path = "./results"
 if not os.path.exists(path):
