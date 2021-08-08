@@ -4,12 +4,14 @@
 from covid import Covid
 import os
 import time
+from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import pandas as pd
 
 os.environ['TZ'] = 'US/Eastern'
-time.tzset()
+if os.name != 'nt':
+    time.tzset()
 
 #keep country name in the same format
 trans_jhu = ['US','United Kingdom','United Arab Emirates']
@@ -78,7 +80,6 @@ if os.path.isfile('./data/data.csv'):
     
     #use the latest result as today's data
     if jhu_data.columns.values[2] == tmp.columns.values[2]:
-        print("same")
         jhu_data = jhu_data.drop(jhu_data.columns.values[2], axis=1)
     
     jhu_data = pd.merge(tmp, jhu_data, on=['id','country'])
@@ -92,6 +93,10 @@ jhu_data.to_csv('./data/data.csv',index=0)
 jhu_data = jhu_data.iloc[:,1:4]
 jhu_data['new_cases'] = jhu_data.iloc[:,1] - jhu_data.iloc[:,2]
 jhu_data.sort_values('new_cases',inplace=True, ascending=False)
+
+#check whether we have missing dates, if so new_cases should be NA
+if (datetime.strptime(jhu_data.columns.values[1],'%Y%m%d') - datetime.strptime(jhu_data.columns.values[2],'%Y%m%d')).days != 1:
+    jhu_data['new_cases'] = pd.NA
 
 jhu_us = jhu_data.loc[jhu_data['country'] == 'US']
 jhu_data = jhu_data.drop(jhu_data.loc[jhu_data['country'] == 'US'].index[0])
