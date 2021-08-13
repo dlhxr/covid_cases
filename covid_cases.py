@@ -6,9 +6,8 @@ import os
 import time
 from datetime import datetime
 from bs4 import BeautifulSoup
+from selenium import webdriver
 import pandas as pd
-import requests
-import json
 
 os.environ['TZ'] = 'US/Eastern'
 if os.name != 'nt':
@@ -32,26 +31,34 @@ def trans(x, orig, final):
 
 #get vaccine numbers from BBG
 
-url = 'https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/'
-header={
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36',
-        'authority': 'www.bloomberg.com',
-        'cache-control': 'max-age=0',
-        'sec-ch-ua': '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"',
-        'sec-ch-ua-mobile': '?0',
-        'upgrade-insecure-requests': '1',
-        'sec-fetch-site': 'none',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-user': '?1',
-        'sec-fetch-dest': 'document'
-    }
+options = webdriver.FirefoxOptions()
+options.headless = True
 
-rep = requests.get(url,headers = header)
-rep = BeautifulSoup(rep.text, 'html.parser').find("script", {"id": "dvz-data-cave"})
-vacc = json.loads(rep.next)
-vacc = [[d['name'], d.get('noCompletedVaccinationPerCapita',None)] for d in vacc['vaccination']['global']]
-vacc=dict(vacc)
+browser = webdriver.Firefox(options=options)
+browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
+
+#click twice to load all countries
+browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
+browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
+
+sourcePage = browser.page_source
+
+soup = BeautifulSoup(sourcePage,"html.parser")
+
+tbodies = soup.select('table tbody tr')
+
+vacc = {}
+for index,tbody in enumerate(tbodies):
+    for i, td in enumerate(tbody.children):
+        if i == 0:
+            name = td.text
+            numbers = []
+        else:
+            try:
+                numbers.append(td.text)
+            except:
+                pass
+    vacc[name] = numbers
 
 #get covid cases from Jhu
 covid = Covid()
@@ -120,7 +127,7 @@ for country in vacclist:
     if vacc.get(country) == None:
         vaccnumber.append('NA')
     else:
-        vaccnumber.append("{:.1%}".format(vacc.get(country)))
+        vaccnumber.append(vacc.get(country)[3])
 
 printlist = [trans(x,trans_en,trans_cn) for x in printlist]
 extralist = [trans(x,trans_en,trans_cn) for x in extralist]
