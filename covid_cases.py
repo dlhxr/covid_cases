@@ -28,7 +28,7 @@ def trans(x, orig, final):
     for i in range(len(orig)):
         x = x.replace(orig[i],final[i])
     return x
-
+'''
 #get vaccine numbers from BBG
 
 options = webdriver.FirefoxOptions()
@@ -59,7 +59,7 @@ for index,tbody in enumerate(tbodies):
             except:
                 pass
     vacc[name] = numbers
-
+'''
 #get covid cases from Jhu
 covid = Covid()
 jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
