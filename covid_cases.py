@@ -124,10 +124,13 @@ vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
 
 vaccnumber = list()
 for country in vacclist:
+    vaccnumber.append('NA')
+    '''
     if vacc.get(country) == None:
         vaccnumber.append('NA')
     else:
         vaccnumber.append(vacc.get(country)[3])
+    '''
 
 printlist = [trans(x,trans_en,trans_cn) for x in printlist]
 extralist = [trans(x,trans_en,trans_cn) for x in extralist]
