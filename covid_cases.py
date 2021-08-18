@@ -100,8 +100,8 @@ try:
     browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
     
     #click twice to load all countries
-    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
-    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
+    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
+    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
     
     sourcePage = browser.page_source
     
