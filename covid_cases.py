@@ -8,6 +8,8 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import pandas as pd
+import requests
+import json
 
 os.environ['TZ'] = 'US/Eastern'
 if os.name != 'nt':
@@ -91,45 +93,67 @@ cases = ["{:.0f}".format(x/10000) for x in list(jhu_data[time.strftime('%Y%m%d',
 #get vaccine country list
 vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
 
+
+bbgurl = 'https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true'
+
 try:
-    #get vaccine numbers from BBG
-    options = webdriver.FirefoxOptions()
-    options.headless = True
-    
-    browser = webdriver.Firefox(options=options)
-    browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
-    
-    #click twice to load all countries
-    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
-    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
-    
-    sourcePage = browser.page_source
-    
-    soup = BeautifulSoup(sourcePage,"html.parser")
-    
-    tbodies = soup.select('table tbody tr')
-    
-    vacc = {}
-    for index,tbody in enumerate(tbodies):
-        for i, td in enumerate(tbody.children):
-            if i == 0:
-                name = td.text
-                numbers = []
+    try:
+        header={
+        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50'
+    }
+        rep = requests.get(bbgurl,headers = header)
+        rep = BeautifulSoup(rep.text, 'html.parser').find("script", {"id": "dvz-data-cave"})
+        vacc = json.loads(rep.next)
+        vacc = [[d['name'], d.get('noCompletedVaccinationPerCapita',None)] for d in vacc['vaccination']['global']]
+        vacc=dict(vacc)
+        vaccnumber = list()
+        for country in vacclist:
+            if vacc.get(country) == None:
+                vaccnumber.append('NA')
             else:
-                try:
-                    numbers.append(td.text)
-                except:
-                    pass
-        vacc[name] = numbers
+                vaccnumber.append("{:.1f}".format(vacc.get(country)*100))
+        print('bbg vaccine number is from direct crawl')
+    except:
+        #get vaccine numbers from BBG
+        options = webdriver.FirefoxOptions()
+        options.headless = True
+        
+        browser = webdriver.Firefox(options=options)
+        browser.get(bbgurl)
+        
+        #click twice to load all countries
+        browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
+        browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
+        
+        sourcePage = browser.page_source
+        
+        soup = BeautifulSoup(sourcePage,"html.parser")
+        
+        tbodies = soup.select('table tbody tr')
+        
+        vacc = {}
+        for index,tbody in enumerate(tbodies):
+            for i, td in enumerate(tbody.children):
+                if i == 0:
+                    name = td.text
+                    numbers = []
+                else:
+                    try:
+                        numbers.append(td.text)
+                    except:
+                        pass
+            vacc[name] = numbers
+        vaccnumber = list()
+        for country in vacclist:
+            if vacc.get(country) == None:
+                vaccnumber.append('NA')
+            else:
+                vaccnumber.append(vacc.get(country)[3])
+        print('bbg vaccine number is from selenium')
 except:
     vaccnumber = ['NA' for country in vacclist]
-else:
-    vaccnumber = list()
-    for country in vacclist:
-        if vacc.get(country) == None:
-            vaccnumber.append('NA')
-        else:
-            vaccnumber.append(vacc.get(country)[3])
+    print('cannot get bbg vaccine number')
+
 
 printlist = [trans(x,trans_en,trans_cn) for x in printlist]
 extralist = [trans(x,trans_en,trans_cn) for x in extralist]
