@@ -28,38 +28,7 @@ def trans(x, orig, final):
     for i in range(len(orig)):
         x = x.replace(orig[i],final[i])
     return x
-'''
-#get vaccine numbers from BBG
 
-options = webdriver.FirefoxOptions()
-options.headless = True
-
-browser = webdriver.Firefox(options=options)
-browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
-
-#click twice to load all countries
-browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
-browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
-
-sourcePage = browser.page_source
-
-soup = BeautifulSoup(sourcePage,"html.parser")
-
-tbodies = soup.select('table tbody tr')
-
-vacc = {}
-for index,tbody in enumerate(tbodies):
-    for i, td in enumerate(tbody.children):
-        if i == 0:
-            name = td.text
-            numbers = []
-        else:
-            try:
-                numbers.append(td.text)
-            except:
-                pass
-    vacc[name] = numbers
-'''
 #get covid cases from Jhu
 covid = Covid()
 jhu = sorted(covid.get_data(), key = lambda i:i['confirmed'], reverse=True)
@@ -119,18 +88,48 @@ extralist = [x for x in countrylist if x not in printlist]
 #get cases and deaths from jhu
 cases = ["{:.0f}".format(x/10000) for x in list(jhu_data[time.strftime('%Y%m%d', time.localtime())])]
 
-#get vaccine number from bbg
+#get vaccine country list
 vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
 
-vaccnumber = list()
-for country in vacclist:
-    vaccnumber.append('NA')
-    '''
-    if vacc.get(country) == None:
-        vaccnumber.append('NA')
-    else:
-        vaccnumber.append(vacc.get(country)[3])
-    '''
+try:
+    #get vaccine numbers from BBG
+    options = webdriver.FirefoxOptions()
+    options.headless = True
+    
+    browser = webdriver.Firefox(options=options)
+    browser.get('https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true')
+    
+    #click twice to load all countries
+    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
+    browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[6]/div[2]/div[2]/button')[0].click()
+    
+    sourcePage = browser.page_source
+    
+    soup = BeautifulSoup(sourcePage,"html.parser")
+    
+    tbodies = soup.select('table tbody tr')
+    
+    vacc = {}
+    for index,tbody in enumerate(tbodies):
+        for i, td in enumerate(tbody.children):
+            if i == 0:
+                name = td.text
+                numbers = []
+            else:
+                try:
+                    numbers.append(td.text)
+                except:
+                    pass
+        vacc[name] = numbers
+except:
+    vaccnumber = ['NA' for country in vacclist]
+else:
+    vaccnumber = list()
+    for country in vacclist:
+        if vacc.get(country) == None:
+            vaccnumber.append('NA')
+        else:
+            vaccnumber.append(vacc.get(country)[3])
 
 printlist = [trans(x,trans_en,trans_cn) for x in printlist]
 extralist = [trans(x,trans_en,trans_cn) for x in extralist]
