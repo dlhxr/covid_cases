@@ -10,6 +10,7 @@ from selenium import webdriver
 import pandas as pd
 import requests
 import json
+import shutil
 
 os.environ['TZ'] = 'US/Eastern'
 if os.name != 'nt':
@@ -177,5 +178,9 @@ print(sentence)
 path = "./results"
 if not os.path.exists(path):
     os.mkdir(path)
+if len(os.listdir(path)) > 3:
+    for file in os.listdir(path):
+        if not file == "old":
+            shutil.move(path + "/" + file, path + "/old")
 with open("./results/" + time.strftime('%Y%m%d%H%M', time.localtime()) +".md", "w") as f_out:
     f_out.write(sentence)
