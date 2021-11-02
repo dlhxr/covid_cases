@@ -54,7 +54,9 @@ if os.path.isfile('./data/data.csv'):
     if jhu_data.columns.values[2] == tmp.columns.values[2]:
         jhu_data = jhu_data.drop(jhu_data.columns.values[2], axis=1)
     
-    jhu_data = pd.merge(tmp, jhu_data, on=['id','country'])
+    #country id changed, can't merge with id anymore
+    jhu_data = pd.merge(tmp, jhu_data, on=['country'])
+    jhu_data.drop('id_y', axis=1, inplace=True)
 
 else:
     jhu_data = tmp
