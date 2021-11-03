@@ -57,6 +57,7 @@ if os.path.isfile('./data/data.csv'):
     #country id changed, can't merge with id anymore
     jhu_data = pd.merge(tmp, jhu_data, on=['country'])
     try:
+        jhu_data.rename(columns={'id_x': 'id'})
         jhu_data.drop('id_y', axis=1, inplace=True)
     except:
         print('id seems the same.')
