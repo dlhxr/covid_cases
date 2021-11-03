@@ -58,7 +58,7 @@ if os.path.isfile('./data/data.csv'):
     jhu_data = pd.merge(tmp, jhu_data, on=['country'])
     try:
         jhu_data.drop('id_y', axis=1, inplace=True)
-    except：
+    except:
         print('id seems the same.')
 
 else:
