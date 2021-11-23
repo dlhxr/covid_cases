@@ -112,14 +112,19 @@ try:
         rep = requests.get(bbgurl,headers = header)
         rep = BeautifulSoup(rep.text, 'html.parser').find("script", {"id": "dvz-data-cave"})
         vacc = json.loads(rep.next)
-        vacc = [[d['name'], d.get('noCompletedVaccinationPerCapita',None)] for d in vacc['vaccination']['global']]
+        vacc = [[d['name'], [d.get('noCompletedVaccinationPerCapita',None), d.get('noBoosterTotalPerCapita',None)]] for d in vacc['vaccination']['global']]
         vacc=dict(vacc)
         vaccnumber = list()
+        boostnumber = list()
         for country in vacclist:
-            if vacc.get(country) == None:
+            if vacc.get(country)[0] == None:
                 vaccnumber.append('NA')
             else:
-                vaccnumber.append("{:.1f}".format(vacc.get(country)*100))
+                vaccnumber.append("{:.1f}".format(vacc.get(country)[0]*100))
+            if vacc.get(country)[1] == None:
+                boostnumber.append('NA')
+            else:
+                boostnumber.append("{:.1f}".format(vacc.get(country)[1]*100))
         print('bbg vaccine number is from direct crawl')
     except:
         #get vaccine numbers from BBG
@@ -171,16 +176,24 @@ words_country = ''
 words_newcases = '分别新增确诊'
 words_cases = '，累计确诊'
 words_vacc = '，疫苗接种完毕比率为'
+words_boost = '，疫苗加强针接种比率为'
 
 for i in range(len(printlist)):
     words_country += printlist[i] + '、'
     words_newcases += newcases[i] + '万例、'
     words_cases += cases[i] + '万例、'
     words_vacc += vaccnumber[i] + '%、'
+    try:
+        words_boost += boostnumber[i] + '%、'
+    except:
+        pass
 
 sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过400万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
 
+sentence_boost = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_boost[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过400万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
+
 print(sentence)
+print(sentence_boost)
 
 path = "./results"
 if not os.path.exists(path):
