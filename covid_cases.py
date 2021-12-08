@@ -89,8 +89,8 @@ printlist = list(jhu_data['country'])
 
 newcases = ["{:.1f}".format(x/10000) for x in list(jhu_data['new_cases'])]
 
-#above 4 million cases
-countrylist = [x for x in jhu if x['confirmed']>4000000]
+#above 5 million cases
+countrylist = [x for x in jhu if x['confirmed']>5000000]
 countrylist = [x['country'] for x in countrylist]
 
 extralist = [x for x in countrylist if x not in printlist]
@@ -188,9 +188,9 @@ for i in range(len(printlist)):
     except:
         pass
 
-sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过400万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
+sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过500万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
 
-sentence_boost = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_boost[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过400万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
+sentence_boost = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_boost[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过500万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
 
 print(sentence)
 print(sentence_boost)
