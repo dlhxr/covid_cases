@@ -79,7 +79,7 @@ if (datetime.strptime(jhu_data.columns.values[1],'%Y%m%d') - datetime.strptime(j
 
 jhu_us = jhu_data.loc[jhu_data['country'] == 'US']
 jhu_data = jhu_data.drop(jhu_data.loc[jhu_data['country'] == 'US'].index[0])
-jhu_data = jhu_us.append(jhu_data.iloc[0:4,:])
+jhu_data = pd.concat([jhu_us,jhu_data.iloc[0:4,:]])
 
 #start building sentence
 
