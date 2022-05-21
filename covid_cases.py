@@ -77,43 +77,46 @@ jhu_data.sort_values('new_cases',inplace=True, ascending=False)
 if (datetime.strptime(jhu_data.columns.values[1],'%Y%m%d') - datetime.strptime(jhu_data.columns.values[2],'%Y%m%d')).days != 1:
     jhu_data['new_cases'] = pd.NA
 
-jhu_us = jhu_data.loc[jhu_data['country'] == 'US']
-jhu_data = jhu_data.drop(jhu_data.loc[jhu_data['country'] == 'US'].index[0])
-jhu_data = pd.concat([jhu_us,jhu_data.iloc[0:4,:]])
-
-#start building sentence
-
-date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[0]['last_update'] // 1000))
-
-printlist = list(jhu_data['country'])
-
-newcases = ["{:.1f}".format(x/10000) for x in list(jhu_data['new_cases'])]
-
-#above 5 million cases
-countrylist = [x for x in jhu if x['confirmed']>10000000]
-countrylist = [x['country'] for x in countrylist]
-
-extralist = [x for x in countrylist if x not in printlist]
-
-#get cases and deaths from jhu
-cases = ["{:.0f}".format(x/10000) for x in list(jhu_data[time.strftime('%Y%m%d', time.localtime())])]
-
-#get vaccine country list
-vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
-
 
 bbgurl = 'https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/?terminal=true'
-
 try:
-    try:
-        header={
-        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50'
-    }
-        rep = requests.get(bbgurl,headers = header)
-        rep = BeautifulSoup(rep.text, 'html.parser').find("script", {"id": "dvz-data-cave"})
-        vacc = json.loads(rep.next)
-        vacc = [[d['name'], [d.get('noCompletedVaccinationPerCapita',None), d.get('noBoosterTotalPerCapita',None)]] for d in vacc['vaccination']['global']]
-        vacc=dict(vacc)
+    header={
+    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50'
+}
+    rep = requests.get(bbgurl,headers = header)
+    rep = BeautifulSoup(rep.text, 'html.parser').find("script", {"id": "dvz-data-cave"})
+    vacc = json.loads(rep.next)
+    vacc = [[d['name'], [d.get('noCompletedVaccinationPerCapita',None), d.get('noBoosterTotalPerCapita',None)]] for d in vacc['vaccination']['global']]
+    vacc=dict(vacc)
+    vacc_flag = True
+except:
+    vacc_flag = False
+
+for num_country in [7,5]:
+    jhu_us = jhu_data.loc[jhu_data['country'] == 'US']
+    jhu_data = jhu_data.drop(jhu_data.loc[jhu_data['country'] == 'US'].index[0])
+    jhu_data = pd.concat([jhu_us,jhu_data.iloc[0:(num_country - 1),:]])
+
+    #start building sentence  
+    date = time.strftime("%Y/%m/%d %H:%M",time.localtime(jhu[0]['last_update'] // 1000))
+    
+    printlist = list(jhu_data['country'])
+    
+    newcases = ["{:.1f}".format(x/10000) for x in list(jhu_data['new_cases'])]
+    
+    #above 5 million cases
+    countrylist = [x for x in jhu if x['confirmed']>10000000]
+    countrylist = [x['country'] for x in countrylist]
+
+    extralist = [x for x in countrylist if x not in printlist]
+    
+    #get cases and deaths from jhu
+    cases = ["{:.0f}".format(x/10000) for x in list(jhu_data[time.strftime('%Y%m%d', time.localtime())])]
+    
+    #get vaccine country list
+    vacclist = [trans(x,trans_jhu,trans_bbg) for x in printlist]
+    
+    if vacc_flag:
         vaccnumber = list()
         boostnumber = list()
         for country in vacclist:
@@ -125,75 +128,38 @@ try:
                 boostnumber.append('NA')
             else:
                 boostnumber.append("{:.1f}".format(vacc.get(country)[1]*100))
-        print('bbg vaccine number is from direct crawl')
-    except:
-        #get vaccine numbers from BBG
-        options = webdriver.FirefoxOptions()
-        options.headless = True
-        
-        browser = webdriver.Firefox(options=options)
-        browser.get(bbgurl)
-        
-        #click twice to load all countries
-        browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
-        browser.find_elements_by_xpath('/html/body/div[5]/section[4]/div/figure[7]/div[2]/div[2]/button')[0].click()
-        
-        sourcePage = browser.page_source
-        
-        soup = BeautifulSoup(sourcePage,"html.parser")
-        
-        tbodies = soup.select('table tbody tr')
-        
-        vacc = {}
-        for index,tbody in enumerate(tbodies):
-            for i, td in enumerate(tbody.children):
-                if i == 0:
-                    name = td.text
-                    numbers = []
-                else:
-                    try:
-                        numbers.append(td.text)
-                    except:
-                        pass
-            vacc[name] = numbers
-        vaccnumber = list()
-        for country in vacclist:
-            if vacc.get(country) == None:
-                vaccnumber.append('NA')
-            else:
-                vaccnumber.append(vacc.get(country)[3])
-        print('bbg vaccine number is from selenium')
-except:
-    vaccnumber = ['NA' for country in vacclist]
-    print('cannot get bbg vaccine number')
+    else:
+        vaccnumber = ['NA' for country in vacclist]
+        boostnumber = ['NA' for country in vacclist]
+        print('cannot get bbg vaccine number')
+    
+    printlist = [trans(x,trans_en,trans_cn) for x in printlist]
+    extralist = [trans(x,trans_en,trans_cn) for x in extralist]
+    
+    words_time = '据约翰霍普金斯大学和彭博统计，截至美东时间%s月%s日下午%s时，' % (f'{int(date[5:7]):.0f}',f'{int(date[8:10]):.0f}',f"{int(date[11:13])-11:.0f}")
+    words_country = ''
+    words_newcases = '分别新增确诊'
+    words_cases = '，累计确诊'
+    words_vacc = '，疫苗接种完毕比率为'
+    words_boost = '，疫苗加强针接种比率为'
+    
+    for i in range(len(printlist)):
+        words_country += printlist[i] + '、'
+        words_newcases += newcases[i] + '万例、'
+        words_cases += cases[i] + '万例、'
+        words_vacc += vaccnumber[i] + '%、'
+        try:
+            words_boost += boostnumber[i] + '%、'
+        except:
+            pass
+    
+    sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过1000万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
+    
+    sentence_boost = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_boost[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过1000万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
+    
+    print(sentence)
+    print(sentence_boost)
 
-
-printlist = [trans(x,trans_en,trans_cn) for x in printlist]
-extralist = [trans(x,trans_en,trans_cn) for x in extralist]
-
-words_time = '据约翰霍普金斯大学和彭博统计，截至美东时间%s月%s日下午%s时，' % (f'{int(date[5:7]):.0f}',f'{int(date[8:10]):.0f}',f"{int(date[11:13])-11:.0f}")
-words_country = ''
-words_newcases = '分别新增确诊'
-words_cases = '，累计确诊'
-words_vacc = '，疫苗接种完毕比率为'
-words_boost = '，疫苗加强针接种比率为'
-
-for i in range(len(printlist)):
-    words_country += printlist[i] + '、'
-    words_newcases += newcases[i] + '万例、'
-    words_cases += cases[i] + '万例、'
-    words_vacc += vaccnumber[i] + '%、'
-    try:
-        words_boost += boostnumber[i] + '%、'
-    except:
-        pass
-
-sentence = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_vacc[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过1000万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
-
-sentence_boost = words_time + words_country[:-1] +  words_newcases[:-1] + words_cases[:-1] + words_boost[:-1] + '。此外，' + '、'.join(extralist) + '累计确诊超过1000万例。' + '目前全球累计确诊%s亿例，累计死亡%s万例。' % (f"{covid.get_total_confirmed_cases()/100000000:.2f}", f"{covid.get_total_deaths()/10000:.0f}")
-
-print(sentence)
-print(sentence_boost)
 
 path = "./results"
 if not os.path.exists(path):
