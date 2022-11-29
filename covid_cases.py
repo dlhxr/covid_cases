@@ -124,7 +124,7 @@ for num_country in [7,5]:
                 vaccnumber.append('NA')
             else:
                 vaccnumber.append("{:.1f}".format(vacc.get(country)[0]*100))
-            if vacc.get(country)[1] == None:
+            if (vacc.get(country) == None) or (vacc.get(country)[1] == None):
                 boostnumber.append('NA')
             else:
                 boostnumber.append("{:.1f}".format(vacc.get(country)[1]*100))
