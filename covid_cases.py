@@ -120,7 +120,7 @@ for num_country in [7,5]:
         vaccnumber = list()
         boostnumber = list()
         for country in vacclist:
-            if vacc.get(country)[0] == None:
+            if (vacc.get(country) == None) or (vacc.get(country)[0] == None):
                 vaccnumber.append('NA')
             else:
                 vaccnumber.append("{:.1f}".format(vacc.get(country)[0]*100))
